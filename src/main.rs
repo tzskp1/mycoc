@@ -9,5 +9,8 @@ fn main() {
   println!("{}", add (&Nat::Zero, Arc::new (Nat::Succ (Arc::new (Nat::Zero)))));
   println!("{}", nat_of_u64 (33));
   println!("{:?}", var ("3999t"));
-  println!("{:?}", square ("square test"));
+  println!("{:?}", term ("square test"));
+  println!("{:?}", term ("\\ 1 -> 2"));
+  println!("{:?}", term ("\\ 1 0 -> 3"));
+  println!("{:?}", term ("\\ square -> 3"));
 }
