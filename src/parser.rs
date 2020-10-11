@@ -85,26 +85,18 @@ pub fn term(input: &str) -> IResult<&str, PseudoTerm> {
     }
     fn right_app<'a>(left: &PseudoTerm, input: &'a str) -> IResult<&'a str, PseudoTerm> {
         let (input, _) = space1(input)?;
-        match term(input) {
-            Ok((input, right)) => Ok((
-                input,
-                rotate_app(&App(Arc::new(left.clone()), Arc::new(right))),
-            )),
+        match with_paren(input) {
+            Ok((input, right)) => Ok((input, App(Arc::new(left.clone()), Arc::new(right)))),
             Err(_) => {
-                let (input, right) = with_paren(input)?;
-                return Ok((input, App(Arc::new(left.clone()), Arc::new(right))));
+                let (input, right) = term(input)?;
+                return Ok((
+                    input,
+                    rotate_app(&App(Arc::new(left.clone()), Arc::new(right))),
+                ));
             }
         }
     }
-    fn with_paren2(input: &str) -> IResult<&str, PseudoTerm> {
-        let (input, _) = tag("(")(input)?;
-        let (input, _) = space0(input)?;
-        let (input, t) = alt((forall, fun, var, star, square))(input)?;
-        let (input, _) = space0(input)?;
-        let (input, _) = tag(")")(input)?;
-        return Ok((input, t));
-    }
-    let (input, left) = alt((with_paren2, forall, fun, var, star, square))(input)?;
+    let (input, left) = alt((with_paren, forall, fun, var, star, square))(input)?;
     match right_app(&left, input) {
         Ok((input, t)) => Ok((input, t)),
         _ => Ok((input, left)),
