@@ -28,4 +28,7 @@ fn main() {
     println!("{:?}", term("0 1 (2 3)"));
     println!("{:?}", term("0 (1 (2 3))"));
     println!("{:?}", term("((0 1) 2) 3"));
+    println!("{:?}", term("(0) 3"));
+    println!("{:?}", term("\\ square -> star 3"));
+    println!("{:?}", term("(\\ square -> star) 3"));
 }

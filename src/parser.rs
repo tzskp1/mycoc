@@ -96,7 +96,15 @@ pub fn term(input: &str) -> IResult<&str, PseudoTerm> {
             }
         }
     }
-    let (input, left) = alt((forall, fun, var, star, square))(input)?;
+    fn with_paren2(input: &str) -> IResult<&str, PseudoTerm> {
+        let (input, _) = tag("(")(input)?;
+        let (input, _) = space0(input)?;
+        let (input, t) = alt((forall, fun, var, star, square))(input)?;
+        let (input, _) = space0(input)?;
+        let (input, _) = tag(")")(input)?;
+        return Ok((input, t));
+    }
+    let (input, left) = alt((with_paren2, forall, fun, var, star, square))(input)?;
     match right_app(&left, input) {
         Ok((input, t)) => Ok((input, t)),
         _ => Ok((input, left)),
