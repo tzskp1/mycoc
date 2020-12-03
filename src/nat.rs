@@ -2,7 +2,7 @@ use self::Nat::{Succ, Zero};
 use std::fmt;
 use std::sync::Arc;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone)]
 pub enum Nat {
     Zero,
     Succ(Arc<Nat>),
@@ -71,3 +71,11 @@ impl fmt::Display for Nat {
         write!(f, "{}", u64_of_nat(self))
     }
 }
+
+impl PartialEq for Nat {
+    fn eq(&self, other: &Self) -> bool {
+        eq(self, other)
+    }
+}
+
+impl Eq for Nat {}

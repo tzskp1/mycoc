@@ -1,7 +1,22 @@
 use mycoc::nat::Nat::*;
 use mycoc::nat::*;
 use mycoc::parser::*;
+use mycoc::term::*;
+use nom::{
+    branch::alt,
+    bytes::complete::{tag, take_while},
+    character::complete::{space0, space1},
+    combinator::map_res,
+    IResult,
+};
 use std::sync::Arc;
+
+fn print_result(term: IResult<&str, PseudoTerm>) {
+    match term {
+        Ok((input, t)) => println!("{}", t),
+        _ => (),
+    }
+}
 
 fn main() {
     println!("{}", Succ(Arc::new(Zero)));
@@ -31,4 +46,10 @@ fn main() {
     println!("{:?}", term("(0) 3"));
     println!("{:?}", term("\\ square -> star 3"));
     println!("{:?}", term("(\\ square -> star) 3"));
+    print_result(term("((0 1) 2) 3"));
+    print_result(term("0 (1 (2 3))"));
+    print_result(term("0 1 (2 3)"));
+    print_result(term("\\ square -> star 3"));
+    print_result(term("(\\ square -> star) 3"));
+    print_result(term("forall square, star"));
 }

@@ -1,9 +1,10 @@
 use self::PseudoTerm::{App, Lambda, Pi, Square, Star, Var};
 use super::nat::Nat::{Succ, Zero};
-use super::nat::{add, eq, leq, sub_arc, Nat};
+use super::nat::{add, leq, sub_arc, Nat};
+use std::fmt;
 use std::sync::Arc;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum PseudoTerm {
     Square,
     Star,
@@ -39,7 +40,7 @@ pub fn shift(m: &PseudoTerm, n: &Nat, c: &Nat) -> Arc<PseudoTerm> {
 pub fn subst(m: &PseudoTerm, n: Arc<PseudoTerm>, v: &Nat) -> Arc<PseudoTerm> {
     match m {
         Var(p) => {
-            if eq(&p, v) {
+            if **p == *v {
                 n
             } else if leq(&p, v) {
                 Arc::new(m.clone())
@@ -66,5 +67,25 @@ pub fn subst(m: &PseudoTerm, n: Arc<PseudoTerm>, v: &Nat) -> Arc<PseudoTerm> {
             ),
         )),
         App(p, q) => Arc::new(App(subst(p, n.clone(), v), subst(q, n, v))),
+    }
+}
+
+impl fmt::Display for PseudoTerm {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Var(p) => write!(f, "{}", p),
+            Star => write!(f, "star"),
+            Square => write!(f, "square"),
+            Pi(p, q) => write!(f, "forall {}, {}", p, q),
+            Lambda(p, q) => write!(f, "\\ {} -> {}", p, q),
+            App(p, q) => match (&**p, &**q) {
+                (Lambda(_, _), App(_, _)) => write!(f, "({}) ({})", p, q),
+                (Pi(_, _), App(_, _)) => write!(f, "({}) ({})", p, q),
+                (_, App(_, _)) => write!(f, "{} ({})", p, q),
+                (Lambda(_, _), _) => write!(f, "({}) {}", p, q),
+                (Pi(_, _), _) => write!(f, "({}) {}", p, q),
+                _ => write!(f, "{} {}", p, q),
+            },
+        }
     }
 }
